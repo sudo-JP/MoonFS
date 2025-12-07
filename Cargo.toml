@@ -2,5 +2,8 @@
 name = "moonfs"
 version = "0.1.0"
 edition = "2024"
+authors = ["Jason Phan"]
+repository = "https://github.com/sudo-JP/MoonFS.git"
 
 [dependencies]
+anyhow = "1.0"
