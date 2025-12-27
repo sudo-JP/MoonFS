@@ -1,5 +1,3 @@
-pub mod parse;
-pub mod add;
+pub mod cli;
 
-pub use parse::*;
-pub use add::*;
+pub use cli::{CLI};

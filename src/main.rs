@@ -1,21 +1,8 @@
-use std::env;
-use moonfs::cli::parse;
-use moonfs::cli::ParseError;
+use clap::Parser;
+use moonfs::cli::{CLI};
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    match parse::parse(args) {
-        Err(ParseError::InvalidArg) => {
+    let cli = CLI::parse();
 
-        },
-
-        Err(ParseError::Empty) => {
-            println!("Usage: push, add")
-        }, 
-
-        Err(ParseError::InvalidPassword) => {
-
-        },
-        _ => {}
-    }
+    // TODO: extract the path from cli, throw error if path doesn't exist
 }
