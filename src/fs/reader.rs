@@ -1,4 +1,4 @@
-use std::{path::{Path, PathBuf}, fs};
+use std::{path::{Path, PathBuf}, fs, io};
 use std::os::unix::fs::PermissionsExt;
 
 const DIR_BIT: u16 = 1 << 10;  // 0o040000
@@ -11,61 +11,40 @@ pub struct FileData {
     pub size: u64  // File size
 }
 
-pub enum FileReaderErr {
-    FileNotFound, 
-    IsDirectory,
-}
-
 /*
  * Assume path is valid, read content from path
  * */
-pub fn read_file(path: &Path) -> Result<FileData, FileReaderErr> {
+pub fn read_file(path: &Path) -> io::Result<FileData> {
     // Check if file exists
-    if !path.exists(){
-        return Err(FileReaderErr::FileNotFound);
+    if !path.exists() {
+        return Err(io::Error::new(io::ErrorKind::NotFound, "File not found"));
     }
 
-    // Read metadata
-    let metadata = match fs::metadata(path){
-        Ok(file_metadata) => file_metadata,
-        Err(_) => return Err(FileReaderErr::FileNotFound),
-    };
+    // Metadata
+    let metadata = fs::metadata(path)?;
 
     // Check if it is a directory
     let perm_bit = metadata.permissions().mode() as u16;
-    if is_directory_from_perm(perm_bit){
-        return Err(FileReaderErr::IsDirectory);
+
+    if (perm_bit & DIR_BIT) != 0 {
+        return Err(io::Error::new(io::ErrorKind::Other, "Is directory"));
     }
 
     // Read file content
-    let content = match fs::read(path){
-        Ok(data) => data,
-        Err(_) => return Err(FileReaderErr::FileNotFound),
-    };
-
-    // Get relative path
-    let relative_path = ? // TODO: FIX
+    let content = fs::read(path)?;
 
     // Get size
     let size = metadata.len();
 
     // Modification timestamp
-    let modified = match metadata.modified(){
-        Ok(time_modified) => time_modified,
-        Err(_) => std::time::SystemTime::now(),
-    };
+    let modified = metadata.modified().unwrap_or_else(|_| std::time::SystemTime::now());
 
     // Return FileData
     Ok(FileData {
-        path: relative_path.to_path_buf(),
+        path: path.to_path_buf(),
         perm_bit,
         content,
         modified,
         size
     })
-}
-
-// Helper function to check if directory from permission bit
-fn is_directory_from_perm(perm_bit: u16) -> bool {
-    (perm_bit & DIR_BIT) != 0
 }
