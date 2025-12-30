@@ -3,6 +3,7 @@ use std::os::unix::fs::PermissionsExt;
 
 const DIR_BIT: u16 = 1 << 10;  // 0o040000
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct FileData {
     pub path: PathBuf,
     pub perm_bit: u16,  // 16 bit for permission bit
