@@ -1,3 +1,3 @@
 pub mod reader;
 
-pub use reader::{FileData, FileReaderErr, read_file};
+pub use reader::{read_direntry, EntryType, DirectoryEntry};
