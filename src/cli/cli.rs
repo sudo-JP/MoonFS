@@ -10,5 +10,11 @@ pub struct CLI {
     pub path: Option<PathBuf>, 
 
     #[arg(short, long)]
-    server: String, 
+    pub server: String,
+
+    #[arg(long, default_value = "127.0.0.1")]
+    pub host: String,
+
+    #[arg(long, default_value = "8000")]
+    pub port: u16,
 }
